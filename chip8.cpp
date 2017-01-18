@@ -10,7 +10,7 @@
 #define OPX(op) ((op & 0x0F00) >> 8)
 #define OPY(op) ((op & 0x00F0) >> 4)
 
-unsigned char chip8_fontset[80] = { 
+unsigned char chip8_fontset[80] = {
   0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
   0x20, 0x60, 0x20, 0x20, 0x70, // 1
   0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -140,7 +140,7 @@ private:
       break;
     }
   }
-  
+
   unsigned short sprite_addr(unsigned short opcode) {
     // store sprite addr of char in Vx to I
     switch (reg[OPX(opcode)]) {
@@ -176,7 +176,7 @@ private:
       return 70;
     case 0xF:
       return 75;
-    default: 
+    default:
       return 0;
     }
   }
@@ -321,7 +321,7 @@ public:
       for (int n = 0; n < 64; n++)
         gfx_memory[i][n] = 0;
   }
-  
+
   void step(SDL_Renderer *renderer) {
     // Fetch Opcode
     opcode = memory[pc] << 8 | memory[pc+1];
