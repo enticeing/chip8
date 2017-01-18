@@ -48,6 +48,8 @@ private:
 
   unsigned char keys[16];
 
+  bool dirty_video = true;
+
   void cpu_zero_opcode(unsigned short opcode) {
     switch(opcode) {
     case 0x00E0:
@@ -115,11 +117,13 @@ private:
       pixel = memory[I+yline];
       for (int xline = 0; xline < 8; xline++)
         if ((pixel & (0x80 >> xline)) != 0) {
-          if (gfx_memory[y+yline][x+xline] == 1)
+          if (gfx_memory[y+yline][x+xline] == 1) {
             reg[15] = 1;
+          }
           gfx_memory[y+yline][x+xline] ^= 1;
 	}
     }
+    dirty_video = true;
   }
 
   void cpu_key_opcode(unsigned short opcode) {
@@ -331,14 +335,17 @@ public:
     sound_timer--;
     delay_timer--;
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    for (int i = 0; i < 32; i++)
-      for (int n = 0; n < 64; n++)
-        if (gfx_memory[i][n] == 1)
-          SDL_RenderDrawPoint(renderer, n, i);
-    SDL_RenderPresent(renderer);
+    if(dirty_video) {
+      SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+      SDL_RenderClear(renderer);
+      SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+      for (int i = 0; i < 32; i++)
+        for (int n = 0; n < 64; n++)
+          if (gfx_memory[i][n] == 1)
+            SDL_RenderDrawPoint(renderer, n, i);
+      SDL_RenderPresent(renderer);
+      dirty_video = false;
+    }
   }
 
   void load_rom(const char* filename) {
